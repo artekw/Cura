@@ -600,10 +600,7 @@ def getBasePath():
 	:return: The path in which the current configuration files are stored. This depends on the used OS.
 	"""
 	if platform.system() == "Windows":
-		basePath = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
-		#If we have a frozen python install, we need to step out of the library.zip
-		if hasattr(sys, 'frozen'):
-			basePath = os.path.normpath(os.path.join(basePath, ".."))
+		basePath = os.path.normpath(os.path.expanduser('~/.cura/%s' % version.getVersion(False)))
 	elif platform.system() == "Darwin":
 		basePath = os.path.expanduser('~/Library/Application Support/Cura/%s' % version.getVersion(False))
 	else:
@@ -620,14 +617,29 @@ def getAlternativeBasePaths():
 	Search for alternative installations of Cura and their preference files. Used to load configuration from older versions of Cura.
 	"""
 	paths = []
-	basePath = os.path.normpath(os.path.join(getBasePath(), '..'))
-	for subPath in os.listdir(basePath):
-		path = os.path.join(basePath, subPath)
-		if os.path.isdir(path) and os.path.isfile(os.path.join(path, 'preferences.ini')) and path != getBasePath():
-			paths.append(path)
-		path = os.path.join(basePath, subPath, 'Cura')
-		if os.path.isdir(path) and os.path.isfile(os.path.join(path, 'preferences.ini')) and path != getBasePath():
-			paths.append(path)
+	try:
+		basePath = os.path.normpath(os.path.join(getBasePath(), '..'))
+		for subPath in os.listdir(basePath):
+			path = os.path.join(basePath, subPath)
+			if os.path.isdir(path) and os.path.isfile(os.path.join(path, 'preferences.ini')) and path != getBasePath():
+				paths.append(path)
+			path = os.path.join(basePath, subPath, 'Cura')
+			if os.path.isdir(path) and os.path.isfile(os.path.join(path, 'preferences.ini')) and path != getBasePath():
+				paths.append(path)
+
+		#Check the old base path, which was in the application directory.
+		oldBasePath = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+		basePath = os.path.normpath(os.path.join(oldBasePath, ".."))
+		for subPath in os.listdir(basePath):
+			path = os.path.join(basePath, subPath)
+			if os.path.isdir(path) and os.path.isfile(os.path.join(path, 'preferences.ini')) and path != oldBasePath:
+				paths.append(path)
+			path = os.path.join(basePath, subPath, 'Cura')
+			if os.path.isdir(path) and os.path.isfile(os.path.join(path, 'preferences.ini')) and path != oldBasePath:
+				paths.append(path)
+	except:
+		pass
+
 	return paths
 
 def getDefaultProfilePath():
@@ -718,6 +730,9 @@ def resetProfile():
 		putProfileSetting('nozzle_size', '0.4')
 		if getMachineSetting('ultimaker_extruder_upgrade') == 'True':
 			putProfileSetting('retraction_enable', 'True')
+	elif getMachineSetting('machine_type') == 'ultimaker_plus':
+		putProfileSetting('nozzle_size', '0.4')
+		putProfileSetting('retraction_enable', 'True')
 	elif getMachineSetting('machine_type') == 'ultimaker2':
 		putProfileSetting('nozzle_size', '0.4')
 		putProfileSetting('retraction_enable', 'True')
