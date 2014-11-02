@@ -538,8 +538,8 @@ validators.warningAbove(settingsDictionary['filament_diameter3'], 3.5, _("Are yo
 validators.warningAbove(settingsDictionary['filament_diameter4'], 3.5, _("Are you sure your filament is that thick? Normal filament is around 3mm or 1.75mm."))
 validators.warningAbove(settingsDictionary['travel_speed'], 300.0, _("It is highly unlikely that your machine can achieve a travel speed above 300mm/s"))
 validators.warningAbove(settingsDictionary['bottom_thickness'], lambda : (float(getProfileSetting('nozzle_size')) * 3.0 / 4.0), _("A bottom layer of more then %.2fmm (3/4 nozzle size) usually give bad results and is not recommended."))
-validators.warningAbove(settingsDictionary['layer0_flow'], 100, _("More flow than 150% is rare and usually not recommended."))
-validators.warningBelow(settingsDictionary['layer0_flow'], 50, _("Less flow than 50% is rare and usually not recommended."))
+validators.warningAbove(settingsDictionary['layer0_flow'], 120, _("More flow than 150% is rare and usually not recommended."))
+validators.warningBelow(settingsDictionary['layer0_flow'], 30, _("Less flow than 50% is rare and usually not recommended."))
 
 #Conditions for multiple extruders
 settingsDictionary['print_temperature2'].addCondition(lambda : int(getMachineSetting('extruder_amount')) > 1)
